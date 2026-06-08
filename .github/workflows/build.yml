@@ -35,7 +35,14 @@ jobs:
             -configuration Release \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            ARCHS="arm64 x86_64" \
             clean build
+
+      - name: Verify it is a universal binary
+        run: |
+          set -euo pipefail
+          lipo -info "build/Build/Products/Release/VideoSlicer.app/Contents/MacOS/VideoSlicer"
 
       - name: Zip the .app
         run: |
