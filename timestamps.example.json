@@ -1,0 +1,6 @@
+[
+  { "name": "intro",     "start": "00:00:05",  "end": "00:00:18.500" },
+  { "name": "highlight", "start": "01:12:40",  "end": "01:12:52" },
+  { "name": "qa_part",   "start": "01:48:03",  "duration": 9.5 },
+  { "name": "outro",     "start": 7200,        "end": 7212.25 }
+]
