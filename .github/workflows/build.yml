@@ -1,0 +1,65 @@
+name: Build macOS app
+
+# Build the app in the cloud and attach a ready-to-run VideoSlicer.zip
+# to a GitHub Release. Runs when you push a version tag (e.g. v1.0.0)
+# or trigger it manually from the Actions tab.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.app
+
+      - name: Build (Release, unsigned)
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project VideoSlicer.xcodeproj \
+            -scheme VideoSlicer \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            clean build
+
+      - name: Zip the .app
+        run: |
+          set -euo pipefail
+          APP="build/Build/Products/Release/VideoSlicer.app"
+          test -d "$APP" || { echo "App not found at $APP"; exit 1; }
+          ditto -c -k --keepParent "$APP" VideoSlicer.zip
+          ls -lh VideoSlicer.zip
+
+      # For manual (workflow_dispatch) runs: grab it from the run's Artifacts.
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VideoSlicer
+          path: VideoSlicer.zip
+
+      # For tag pushes: publish a downloadable Release.
+      - name: Attach to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: VideoSlicer.zip
+          body: |
+            Unsigned build of VideoSlicer.
+
+            **Install**
+            1. Download `VideoSlicer.zip` below and unzip it.
+            2. Move `VideoSlicer.app` to `/Applications`.
+            3. First launch: right-click the app -> Open -> Open
+               (or run: `xattr -dr com.apple.quarantine /Applications/VideoSlicer.app`).
+            4. Install the cutting engine once: `brew install ffmpeg`.
