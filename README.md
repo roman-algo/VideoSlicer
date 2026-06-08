@@ -43,6 +43,20 @@ See [`timestamps.example.json`](timestamps.example.json).
 
 <br>
 
+## Convert to MP4 (lossless)
+
+The **Convert** tab remuxes files (e.g. `.mkv`) into `.mp4` **losslessly** — it
+copies the existing video/audio streams into an MP4 container with `-c copy`, so
+there's no re-encoding and no quality loss (a full movie converts in seconds).
+Drop in one or many files, optionally choose an output folder (default: next to
+each source), and hit Convert.
+
+> Subtitles are dropped by default for reliability. Turn on *Keep text subtitles*
+> to carry text subs across as `mov_text`. Image-based subs (PGS/VOBSUB) can't
+> live in MP4 and will fail if that option is on.
+
+<br>
+
 ## Requirements
 
 - **macOS 13 (Ventura) or newer**

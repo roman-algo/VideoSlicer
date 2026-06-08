@@ -18,18 +18,11 @@ final class SlicerModel: ObservableObject {
     @Published var statusLine = "Ready."
     @Published var log: [String] = []
 
-    private let ffmpegDefaultsKey = "ffmpegPath"
-
     init() {
-        if let saved = UserDefaults.standard.string(forKey: ffmpegDefaultsKey),
-           FileManager.default.isExecutableFile(atPath: saved) {
-            ffmpegPath = saved
-        } else if let detected = FFmpegLocator.autoDetect() {
-            ffmpegPath = detected
-        }
+        ffmpegPath = FFmpegStore.current()
     }
 
-    var ffmpegReady: Bool { FileManager.default.isExecutableFile(atPath: ffmpegPath) }
+    var ffmpegReady: Bool { FFmpegStore.isReady(ffmpegPath) }
 
     var canStart: Bool {
         videoURL != nil && outputDir != nil && ffmpegReady && !isRunning
@@ -37,7 +30,7 @@ final class SlicerModel: ObservableObject {
 
     func setFFmpeg(_ path: String) {
         ffmpegPath = path
-        UserDefaults.standard.set(path, forKey: ffmpegDefaultsKey)
+        FFmpegStore.set(path)
     }
 
     /// Re-parses the JSON and refreshes the preview list.
